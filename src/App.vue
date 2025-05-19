@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
 import Button from 'primevue/button';
 import { Form } from '@primevue/forms';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Select from 'primevue/select';
+import { useUserStore } from './state/user-store';
+
+const store = useUserStore();
+
 </script>
 
 <template>
