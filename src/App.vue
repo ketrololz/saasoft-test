@@ -4,7 +4,7 @@ import { Form, FormField } from '@primevue/forms';
 import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
 import { useUserStore, type MarkText, type User } from './state/user-store';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { userSchema } from './validator/schema';
 
@@ -50,18 +50,31 @@ const resolver = yupResolver(userSchema);
 const initialValues = {
   login: '',
   password: '',
+  type: 'Local',
 };
 
+const formRefs = reactive<{ [key: string]: any }>({});
+
 function onBlur(form: any, user: User) {
-  if (form.valid) {
+  
+  const formRef = formRefs[user.id];
+  formRef.validate()
+
+  if (formRef.valid) {
     const userFromStore = store.getUserById(user.id);
     if (!userFromStore) {
       return;
     }
 
     userFromStore.login = form.login.value;
-    userFromStore.password = form.password.value;
-    userFromStore.marks = parseMarks(form.marks.value)
+
+    if (userFromStore.type === 'Local') {
+      userFromStore.password = form.password.value;
+    } else {
+      userFromStore.password = null;
+    }
+
+    userFromStore.marks = parseMarks(form.marks.value);
   }
 }
 </script>
@@ -86,6 +99,7 @@ function onBlur(form: any, user: User) {
       </div>
     </div>
     <Form
+      :ref="(el) => (formRefs[user.id] = el)"
       v-for="user of store.userList"
       v-bind:key="user.id"
       v-slot="form"
@@ -127,7 +141,7 @@ function onBlur(form: any, user: User) {
         <div class="flex gap-2 w-full">
           <FormField
             v-slot="$field"
-            name="username"
+            name="login"
             :initialValue="user.login"
             class="w-full"
           >
