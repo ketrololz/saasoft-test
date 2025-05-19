@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import Button from 'primevue/button';
-import { Form } from '@primevue/forms';
+import { Form, FormField } from '@primevue/forms';
 import InputText from 'primevue/inputtext';
-import Password from 'primevue/password';
 import Select from 'primevue/select';
 import { useUserStore, type MarkText, type User } from './state/user-store';
 import { ref, computed } from 'vue';
+import { yupResolver } from '@primevue/forms/resolvers/yup';
+import { userSchema } from './validator/schema';
 
 const store = useUserStore();
 const accountType = ref([
@@ -33,20 +34,7 @@ function convertMarks(marks: MarkText[]) {
 }
 
 function parseMarks(text: string): MarkText[] {
-  return text
-    .split(';')
-    .map(text => ({ text: text.trim() }));
-}
-
-function useMarksText(user: User) {
-  return computed<string>({
-    get() {
-      return convertMarks(user.marks);
-    },
-    set(newValue: string) {
-      user.marks = parseMarks(newValue);
-    }
-  });
+  return text.split(';').map((text) => ({ text: text.trim() }));
 }
 
 function createUser() {
@@ -58,11 +46,31 @@ function createUser() {
     marks: [],
   };
 
-  store.addUser(user)
+  store.addUser(user);
 }
 
 function generateId(): string {
   return self.crypto.randomUUID();
+}
+
+const resolver = yupResolver(userSchema);
+
+const initialValues = {
+  login: '',
+  password: '',
+};
+
+function onBlur(form: any, user: User) {
+  if (form.valid) {
+    const userFromStore = store.getUserById(user.id);
+    if (!userFromStore) {
+      return;
+    }
+
+    userFromStore.login = form.login.value;
+    userFromStore.password = form.password.value;
+    userFromStore.marks = parseMarks(form.marks.value)
+  }
 }
 
 store.addUser(testUser);
@@ -73,7 +81,11 @@ store.addUser(testUser);
     <div class="flex flex-col gap-y-4">
       <div class="flex items-center gap-x-4">
         <h1 class="text-2xl font-semibold">Учётные записи</h1>
-        <Button icon="pi pi-plus" variant="outlined" @click="createUser"></Button>
+        <Button
+          icon="pi pi-plus"
+          variant="outlined"
+          @click="createUser"
+        ></Button>
       </div>
       <div
         class="bg-(--p-button-secondary-background) px-4 py-3 rounded-xl flex items-center gap-x-2"
@@ -86,55 +98,80 @@ store.addUser(testUser);
     <Form
       v-for="user of store.userList"
       v-bind:key="user.id"
-      v-slot="$form"
+      v-slot="form"
       class="flex flex-col gap-4 w-full pt-4"
+      :initial-values="initialValues"
+      :resolver="resolver"
+      :validate-on-blur="true"
     >
       <div class="flex gap-2">
-        <InputText
-          name="mark"
-          type="text"
-          placeholder="XXX; YYY"
-          class="min-w-40"
-          :modelValue="useMarksText(user).value"
-          @update:modelValue="useMarksText(user).value = $event ?? ''"
-          fluid
-        />
+        <FormField
+          v-slot="$field"
+          name="marks"
+          :initialValue="convertMarks(user.marks)"
+          class="w-full"
+        >
+          <InputText
+            name="marks"
+            type="text"
+            placeholder="XXX; YYY"
+            class="min-w-40"
+            v-model="$field.value"
+            @blur="onBlur(form, user)"
+            maxlength="50"
+            fluid
+          />
+        </FormField>
         <Select
           v-model="user.type"
           :options="accountType"
           optionLabel="name"
           optionValue="type"
           class="min-w-40"
-          @change="(e) => { if (e.value === 'LDAP') user.password = null }"
+          @change="
+            (e) => {
+              if (e.value === 'LDAP') user.password = null;
+            }
+          "
         />
         <div class="flex gap-2 w-full">
-          <InputText
-            name="login"
-            type="text"
-            placeholder="Логин"
-            v-model="user.login"
-            class="flex-1"
-            fluid
-          />
-          <Password
+          <FormField
+            v-slot="$field"
+            name="username"
+            :initialValue="user.login"
+            class="w-full"
+          >
+            <InputText
+              name="login"
+              type="text"
+              v-model="$field.value"
+              placeholder="Логин"
+              class="flex-1"
+              maxlength="100"
+              @blur="onBlur(form, user)"
+              fluid
+            />
+          </FormField>
+          <FormField
             v-if="user.type === 'Local'"
+            v-slot="$field"
             name="password"
-            type="password"
-            placeholder="Пароль"
-            toggle-mask
-            v-model="user.password"
-            :feedback="false"
-            class="flex-1"
-            fluid
-          />
+            :initialValue="user.password"
+            class="w-full"
+          >
+            <InputText
+              name="password"
+              type="password"
+              placeholder="Пароль"
+              v-model="$field.value"
+              :feedback="false"
+              class="flex-1"
+              maxlength="100"
+              @blur="onBlur(form, user)"
+              fluid
+            />
+          </FormField>
         </div>
-        <Message
-          v-if="$form.username?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-          >{{ $form.username.error?.message }}</Message
-        >
         <Button
           severity="secondary"
           icon="pi pi-trash"

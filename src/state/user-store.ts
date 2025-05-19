@@ -20,7 +20,7 @@ export const useUserStore = defineStore('user', {
     getUserById: (state) => {
       return (userId: string) =>
         state.userList.find((user) => user.id === userId);
-    },
+    }
   },
   actions: {
     addUser(user: User) {
