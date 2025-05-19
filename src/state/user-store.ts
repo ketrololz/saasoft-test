@@ -5,7 +5,7 @@ export type MarkText = {
 };
 
 export interface User {
-  id: number;
+  id: string;
   marks: MarkText[];
   type: 'LDAP' | 'Local';
   login: string;
@@ -18,7 +18,7 @@ export const useUserStore = defineStore('user', {
   }),
   getters: {
     getUserById: (state) => {
-      return (userId: number) =>
+      return (userId: string) =>
         state.userList.find((user) => user.id === userId);
     },
   },
@@ -26,7 +26,7 @@ export const useUserStore = defineStore('user', {
     addUser(user: User) {
       this.userList.push(user);
     },
-    removeUser(userId: number) {
+    removeUser(userId: string) {
       this.userList = this.userList.filter((user) => user.id !== userId);
     },
   },

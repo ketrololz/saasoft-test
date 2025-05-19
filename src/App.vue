@@ -5,7 +5,7 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Select from 'primevue/select';
 import { useUserStore, type MarkText, type User } from './state/user-store';
-import { markRaw, ref } from 'vue';
+import { ref } from 'vue';
 
 const store = useUserStore();
 const accountType = ref([
@@ -20,19 +20,35 @@ const accountType = ref([
 ]);
 
 const testUser: User = {
-  id: 1,
+  id: generateId(),
   login: 'test',
   type: 'Local',
   password: '12345',
-  marks: [{ text: 'test' }, { text: 'test2' }]
-}
+  marks: [{ text: 'test' }, { text: 'test2' }],
+};
 
 function convertMarks(marks: MarkText[]) {
   const result = marks.reduce((acc, mark) => acc.concat(mark.text, '; '), '');
   return result.trim().slice(0, -1);
 }
 
-store.addUser(testUser)
+function createUser() {
+  const user: User = {
+    id: generateId(),
+    login: '',
+    type: 'Local',
+    password: '',
+    marks: [],
+  };
+
+  store.addUser(user)
+}
+
+function generateId(): string {
+  return self.crypto.randomUUID();
+}
+
+store.addUser(testUser);
 </script>
 
 <template>
@@ -40,7 +56,7 @@ store.addUser(testUser)
     <div class="flex flex-col gap-y-4">
       <div class="flex items-center gap-x-4">
         <h1 class="text-2xl font-semibold">Учётные записи</h1>
-        <Button icon="pi pi-plus" variant="outlined"></Button>
+        <Button icon="pi pi-plus" variant="outlined" @click="createUser"></Button>
       </div>
       <div
         class="bg-(--p-button-secondary-background) px-4 py-3 rounded-xl flex items-center gap-x-2"
@@ -99,7 +115,12 @@ store.addUser(testUser)
           variant="simple"
           >{{ $form.username.error?.message }}</Message
         >
-        <Button severity="secondary" icon="pi pi-trash" class="min-w-10" @click="store.removeUser(user.id)" />
+        <Button
+          severity="secondary"
+          icon="pi pi-trash"
+          class="min-w-10"
+          @click="store.removeUser(user.id)"
+        />
       </div>
     </Form>
   </div>
