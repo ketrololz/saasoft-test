@@ -5,7 +5,7 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Select from 'primevue/select';
 import { useUserStore, type MarkText, type User } from './state/user-store';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const store = useUserStore();
 const accountType = ref([
@@ -30,6 +30,23 @@ const testUser: User = {
 function convertMarks(marks: MarkText[]) {
   const result = marks.reduce((acc, mark) => acc.concat(mark.text, '; '), '');
   return result.trim().slice(0, -1);
+}
+
+function parseMarks(text: string): MarkText[] {
+  return text
+    .split(';')
+    .map(text => ({ text: text.trim() }));
+}
+
+function useMarksText(user: User) {
+  return computed<string>({
+    get() {
+      return convertMarks(user.marks);
+    },
+    set(newValue: string) {
+      user.marks = parseMarks(newValue);
+    }
+  });
 }
 
 function createUser() {
@@ -78,7 +95,8 @@ store.addUser(testUser);
           type="text"
           placeholder="XXX; YYY"
           class="min-w-40"
-          :value="convertMarks(user.marks)"
+          :modelValue="useMarksText(user).value"
+          @update:modelValue="useMarksText(user).value = $event ?? ''"
           fluid
         />
         <Select
@@ -87,17 +105,19 @@ store.addUser(testUser);
           optionLabel="name"
           optionValue="type"
           class="min-w-40"
+          @change="(e) => { if (e.value === 'LDAP') user.password = null }"
         />
         <div class="flex gap-2 w-full">
           <InputText
             name="login"
             type="text"
             placeholder="Логин"
-            :value="user.login"
+            v-model="user.login"
             class="flex-1"
             fluid
           />
           <Password
+            v-if="user.type === 'Local'"
             name="password"
             type="password"
             placeholder="Пароль"
