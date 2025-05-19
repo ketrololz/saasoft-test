@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { useLocalStorage } from '@vueuse/core';
 
 export type MarkText = {
   text: string;
@@ -14,13 +15,13 @@ export interface User {
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    userList: [] as User[],
+    userList: useLocalStorage<User[]>('ketrololz-user-list', []),
   }),
   getters: {
     getUserById: (state) => {
       return (userId: string) =>
         state.userList.find((user) => user.id === userId);
-    }
+    },
   },
   actions: {
     addUser(user: User) {

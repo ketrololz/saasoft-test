@@ -4,7 +4,7 @@ import { Form, FormField } from '@primevue/forms';
 import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
 import { useUserStore, type MarkText, type User } from './state/user-store';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { yupResolver } from '@primevue/forms/resolvers/yup';
 import { userSchema } from './validator/schema';
 
@@ -19,14 +19,6 @@ const accountType = ref([
     type: 'LDAP',
   },
 ]);
-
-const testUser: User = {
-  id: generateId(),
-  login: 'test',
-  type: 'Local',
-  password: '12345',
-  marks: [{ text: 'test' }, { text: 'test2' }],
-};
 
 function convertMarks(marks: MarkText[]) {
   const result = marks.reduce((acc, mark) => acc.concat(mark.text, '; '), '');
@@ -72,8 +64,6 @@ function onBlur(form: any, user: User) {
     userFromStore.marks = parseMarks(form.marks.value)
   }
 }
-
-store.addUser(testUser);
 </script>
 
 <template>

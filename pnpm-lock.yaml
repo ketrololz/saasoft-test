@@ -20,6 +20,9 @@ importers:
       '@vee-validate/yup':
         specifier: ^4.15.0
         version: 4.15.0(vue@3.5.14(typescript@5.8.3))(yup@1.6.1)
+      '@vueuse/core':
+        specifier: ^13.2.0
+        version: 13.2.0(vue@3.5.14(typescript@5.8.3))
       pinia:
         specifier: ^3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.14(typescript@5.8.3))
@@ -564,6 +567,9 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
+  '@types/web-bluetooth@0.0.21':
+    resolution: {integrity: sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==}
+
   '@typescript-eslint/eslint-plugin@8.32.1':
     resolution: {integrity: sha512-6u6Plg9nP/J1GRpe/vcjjabo6Uc5YQPAMxsgQyGC/I0RuukiG1wIe3+Vtg3IrSCVJDmqK3j8adrtzXSENRtFgg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -691,6 +697,19 @@ packages:
         optional: true
       vue:
         optional: true
+
+  '@vueuse/core@13.2.0':
+    resolution: {integrity: sha512-n5TZoIAxbWAQ3PqdVPDzLgIRQOujFfMlatdI+f7ditSmoEeNpPBvp7h2zamzikCmrhFIePAwdEQB6ENccHr7Rg==}
+    peerDependencies:
+      vue: ^3.5.0
+
+  '@vueuse/metadata@13.2.0':
+    resolution: {integrity: sha512-kPpzuQCU0+D8DZCzK0iPpIcXI+6ufWSgwnjJ6//GNpEn+SHViaCtR+XurzORChSgvpHO9YC8gGM97Y1kB+UabA==}
+
+  '@vueuse/shared@13.2.0':
+    resolution: {integrity: sha512-vx9ZPDF5HcU9up3Jgt3G62dMUfZEdk6tLyBAHYAG4F4n73vpaA7J5hdncDI/lS9Vm7GA/FPlbOmh9TrDZROTpg==}
+    peerDependencies:
+      vue: ^3.5.0
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -1733,6 +1752,8 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
+  '@types/web-bluetooth@0.0.21': {}
+
   '@typescript-eslint/eslint-plugin@8.32.1(@typescript-eslint/parser@8.32.1(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
@@ -1928,6 +1949,19 @@ snapshots:
   '@vue/tsconfig@0.7.0(typescript@5.8.3)(vue@3.5.14(typescript@5.8.3))':
     optionalDependencies:
       typescript: 5.8.3
+      vue: 3.5.14(typescript@5.8.3)
+
+  '@vueuse/core@13.2.0(vue@3.5.14(typescript@5.8.3))':
+    dependencies:
+      '@types/web-bluetooth': 0.0.21
+      '@vueuse/metadata': 13.2.0
+      '@vueuse/shared': 13.2.0(vue@3.5.14(typescript@5.8.3))
+      vue: 3.5.14(typescript@5.8.3)
+
+  '@vueuse/metadata@13.2.0': {}
+
+  '@vueuse/shared@13.2.0(vue@3.5.14(typescript@5.8.3))':
+    dependencies:
       vue: 3.5.14(typescript@5.8.3)
 
   acorn-jsx@5.3.2(acorn@8.14.1):
